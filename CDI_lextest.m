@@ -24,7 +24,7 @@ end
 % Check and parse audio directory
 tmp = dir([audiodir '/*.wav']);
 
-if(length(tmp) ~= 1760)
+if(length(tmp) ~= 1780)
     error('The number of original audio files does not match expectation (incorrect path?)');
 end
 
@@ -69,7 +69,7 @@ if(strcmp(opmode,'single'))
         emb_ID{k} = tmp(k).name(1:end-4);
     end
 
-    if(length(tmp) ~= 1760)
+    if(length(tmp) ~= 1780)
         error('The number of embedding files does not match the number of audio files');
     end
 
@@ -136,7 +136,7 @@ elseif(strcmp(opmode,'full'))
         emb_ID{k} = tmp(k).name(1:end-4);
     end
 
-    if(length(tmp) ~= 1760)
+    if(length(tmp) ~= 1780)
         error('The number of embedding files does not match the number of audio files');
     end
 
