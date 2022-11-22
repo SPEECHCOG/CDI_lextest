@@ -33,6 +33,20 @@ or for parallel computing (recommended if parfor available):
 
 4) Results will be written in `output.txt`    
 
+By default, audio files are located in `CDI_synth/`
+
 #### Running from MATLAB desktop
 
-You can run the code as a normal MATLAB script by calling CDI_lextest.m directly (the same syntax as above). 
+You can run the code as a normal MATLAB script by calling CDI_lextest.m directly (the same syntax as above).
+
+#### Baseline
+
+In order to replicate baselines with log-Mel features, run:
+
+`sh CDI_lextest.sh 'CDI_synth/' 'demodata/CDI_embs_uttlevel/'``
+
+or
+
+`sh CDI_lextest.sh 'CDI_synth/' 'demodata/CDI_embs_frame/' 'full' 1`
+
+which should produce 17.10% and 47.08%, respectively.
