@@ -13,17 +13,22 @@ Frame-level embeddings per wav: each .txt file should have one frame per row, em
 
 #### Running from command line (tested on Narvi)
 
-Get a CPU node.
+1) Get a CPU node.  
+
+2) Load MATLAB if not present. e.g.:  
 
 `module load matlab`  
 
+For utterance-level embeddings, execute:  
 
-`matlab -batch 'CDI_lextest '/path_to/original/audios/' '/path_to/extracted/embeddings/';' > output.txt`  
+`sh CDI_lextest.sh '/path_to/original/audios/' '/path_to/extracted/utt_level_embeddings/`
 
+For frame-level embeddings, execute:  
 
+`sh CDI_lextest.sh '/path_to/original/audios/' '/path_to/extracted/frame_level_embeddings/' 'full' 0`
 
-`matlab -batch 'CDI_lextest '/path_to/original/audios/' '/path_to/extracted/embeddings/' 'full' 1;' > output.txt`  
+or for parallel computing:  
 
-A cleaner output.txt version looks like this:  
+`sh CDI_lextest.sh '/path_to/original/audios/' '/path_to/extracted/frame_level_embeddings/' 'full' 1`
 
-`matlab -batch 'CDI_lextest '/path_to/original/audios/' '/path_to/extracted/embeddings/' 'single' 0;' > tmp.txt; grep "recall" tmp.txt | { grep -v grep || true; } > output.txt;rm tmp.txt`
+Results will be written in output.txt    
