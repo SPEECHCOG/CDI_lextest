@@ -32,3 +32,7 @@ or for parallel computing (recommended if parfor available):
 `sh CDI_lextest.sh '/path_to/original/audios/' '/path_to/extracted/frame_level_embeddings/' 'full' 1`
 
 4) Results will be written in `output.txt`    
+
+#### Running from MATLAB desktop
+
+You can run the code as a normal MATLAB script by calling CDI_lextest.m directly (the same syntax as above). 
