@@ -11,7 +11,7 @@ Frame-level embeddings per wav: each .txt file should have one frame per row, em
 * Run evaluation software to get overall separability score.
 
 
-#### Running from command line (tested on Narvi)
+#### Running from command line (tested on Narvi and Puhti clusters)
 
 1) Get a CPU node.  
 
@@ -31,4 +31,4 @@ or for parallel computing (recommended if parfor available):
 
 `sh CDI_lextest.sh '/path_to/original/audios/' '/path_to/extracted/frame_level_embeddings/' 'full' 1`
 
-4) Results will be written in output.txt    
+4) Results will be written in `output.txt`    
