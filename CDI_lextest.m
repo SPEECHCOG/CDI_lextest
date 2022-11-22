@@ -21,9 +21,12 @@ if nargin <3
     opmode = 'single';
 end
 
-%audiodir = '/Users/rasaneno/speechdb/CDI_synth/';
-
+% Check and parse audio directory
 tmp = dir([audiodir '/*.wav']);
+
+if(length(tmp) ~= 1760)
+    error('The number of original audio files does not match expectation (incorrect path?)');
+end
 
 filenames = cell(length(tmp),1);
 word = cell(length(tmp),1);
@@ -31,28 +34,31 @@ spkr = cell(length(tmp),1);
 style = cell(length(tmp),1);
 for k = 1:length(tmp)
     filenames{k} = [audiodir '/' tmp(k).name];
-    word{k} = tmp(k).name(1:end-7);
-    spkr{k} = tmp(k).name(end-5);
+    word{k} = tmp(k).name(1:end-7); % word type
+    spkr{k} = tmp(k).name(end-5); % speaker ID
     if(strcmp(tmp(k).name(end-4),'q'))
-        style{k} = 'Q';
+        style{k} = 'Q'; % question style
     else
-        style{k} = 'S';
+        style{k} = 'S'; % statement style
     end
 end
 
 
-uq_words = unique(word);
 
-labels = zeros(length(word),1);
+uq_words = unique(word); % unique word types
 
+% convert word types to integer labels
+labels = zeros(length(word),1); 
 for k = 1:length(word)
     labels(k) = find(strcmp(uq_words,word{k}));
 end
 
 
+% Check how many tokens per type (should be 20)
 N_tokens = sum(labels == 1);
 
 
+% Evaluate word-level embeddings
 if(strcmp(opmode,'single'))
 
     % Load embeddings
@@ -61,6 +67,10 @@ if(strcmp(opmode,'single'))
     emb_ID = cell(length(tmp),1);
     for k = 1:length(tmp)
         emb_ID{k} = tmp(k).name(1:end-4);
+    end
+
+    if(length(tmp) ~= 1760)
+        error('The number of embedding files does not match the number of audio files');
     end
 
     % Check dimension by loading one
@@ -72,7 +82,7 @@ if(strcmp(opmode,'single'))
     X = zeros(length(filenames),dim);
 
     for k = 1:length(filenames)
-        [a,b,c] = fileparts(filenames{k});
+        [~,b,c] = fileparts(filenames{k});
 
         i = find(strcmp(emb_ID,b));
         if(~isempty(i))
@@ -80,35 +90,34 @@ if(strcmp(opmode,'single'))
             X(k,:) = str2num(fgetl(fid));
             fclose(fid);
         else
-            error('cannot find embedding for %s',b);
+            error('cannot find embedding for %s%s',b,c);
         end
     end
 
 
 
+    % Find nearest embeddings for each embedding, and check if they are the same class or not.
+    % This is done as "n-fold" code to avoid all-to-all distance matrix
+    % generation.
 
-
-    % Run a diagnostic classifier
-
-    k_nearest = N_tokens-1;
+    k_nearest = N_tokens-1; % find all nearest training samples for each test sample
 
     recall = zeros(length(uq_words),N_tokens);
-
     for fold = 1:N_tokens
         i_test = fold:N_tokens:length(labels);
         i_train = setxor(i_test,1:length(labels));
 
         labels_train = labels(i_train);
-        labels_test = labels(i_test);
+        labels_test = labels(i_test); % These are always [1, 2, ..., 88]
 
         D = pdist2(X(i_test,:),X(i_train,:),'cosine');
 
-        [D_sort,D_ind] = sort(D,2,'ascend');
+        [~,D_ind] = sort(D,2,'ascend');
 
         hypos = labels_train(D_ind(:,1:k_nearest));
 
         for k = 1:size(hypos,1)
-            recall(k,fold) = sum(hypos(k,:) == k)./(N_tokens-1);
+            recall(k,fold) = sum(hypos(k,:) == labels_test(k))./(N_tokens-1);
         end
     end
 
@@ -127,17 +136,22 @@ elseif(strcmp(opmode,'full'))
         emb_ID{k} = tmp(k).name(1:end-4);
     end
 
+    if(length(tmp) ~= 1760)
+        error('The number of embedding files does not match the number of audio files');
+    end
+
     % Check dimension by loading one
     fid = fopen([embdir '/' tmp(1).name]);
     line = str2num(fgetl(fid));
     fclose(fid);
     dim = length(line);
 
-    F = cell(length(filenames),1);
 
+    % Load rest of the embeddings
+    F = cell(length(filenames),1);
     for k = 1:length(filenames)
         F{k} = zeros(1000,dim);
-        [a,b,c] = fileparts(filenames{k});
+        [~,b,c] = fileparts(filenames{k});
 
         i = find(strcmp(emb_ID,b));
         if(~isempty(i))
@@ -154,10 +168,9 @@ elseif(strcmp(opmode,'full'))
             F{k}(c:end,:) = [];
             fclose(fid);
         else
-            error('cannot find embedding for %s',b);
+            error('cannot find embedding for %s%s',b,c);
         end
     end
-
 
 
     % Version 2: use dtw
@@ -180,13 +193,13 @@ elseif(strcmp(opmode,'full'))
             D{fold} = zeros(length(i_test),length(i_train));
 
             for k = 1:length(i_test)
-
+                
                 Y = F{i_test(k)};
-                [row,col] = find(isnan(Y));
+                [row,~] = find(isnan(Y)); % Clean NaNs
                 Y(row,:) = [];
                 for j = 1:length(i_train)
                     YY = F{i_train(j)};
-                    [row,col] = find(isnan(YY));
+                    [row,~] = find(isnan(YY)); % Clean NaNs
                     YY(row,:) = [];
                     D{fold}(k,j) = dtw(Y',YY');
                     %[p,q,~,sc] = dpfast(pdist2(Y,YY,'euclidean'));
@@ -194,16 +207,17 @@ elseif(strcmp(opmode,'full'))
                 end
             end
 
-            [D_sort,D_ind] = sort(D{fold},2,'ascend');
+            [~,D_ind] = sort(D{fold},2,'ascend');
 
             hypos = labels_train(D_ind(:,1:k_nearest));
 
             for k = 1:size(hypos,1)
-                recall{fold}(k) = sum(hypos(k,:) == k)./(N_tokens-1);
+                recall{fold}(k) = sum(hypos(k,:) == labels_test(k))./(N_tokens-1);
             end
         end
 
     else
+        % Same code as above, but without parfor loop 
         for fold = 1:N_tokens
             i_test = fold:N_tokens:length(labels);
             i_train = setxor(i_test,1:length(labels));
@@ -216,11 +230,11 @@ elseif(strcmp(opmode,'full'))
             for k = 1:length(i_test)
 
                 Y = F{i_test(k)};
-                [row,col] = find(isnan(Y));
+                [row,~] = find(isnan(Y));
                 Y(row,:) = [];
                 for j = 1:length(i_train)
                     YY = F{i_train(j)};
-                    [row,col] = find(isnan(YY));
+                    [row,~] = find(isnan(YY));
                     YY(row,:) = [];
                     D{fold}(k,j) = dtw(Y',YY');
                     %[p,q,~,sc] = dpfast(pdist2(Y,YY,'euclidean'));
@@ -228,12 +242,12 @@ elseif(strcmp(opmode,'full'))
                 end
             end
 
-            [D_sort,D_ind] = sort(D{fold},2,'ascend');
+            [~,D_ind] = sort(D{fold},2,'ascend');
 
             hypos = labels_train(D_ind(:,1:k_nearest));
 
             for k = 1:size(hypos,1)
-                recall{fold}(k) = sum(hypos(k,:) == k)./(N_tokens-1);
+                recall{fold}(k) = sum(hypos(k,:) == labels_test(k))./(N_tokens-1);
             end
         end
     end
