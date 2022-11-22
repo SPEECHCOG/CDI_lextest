@@ -1,9 +1,9 @@
 ## Word separability test for words in CDI words and gestures (short form; North American English).
 
 
-#### Getting started
+## Getting started
 
-* Run your model on the audio files and extract embeddings as corresponding .txt files into `/path_to/extracted/embeddings/`. Embeddings can be one embedding per .wav or frame-level embeddings.
+* Run your model on the audio files at `CDI_synth/` and extract embeddings as corresponding .txt files into `/path_to/extracted/embeddings/`. Embeddings can be one embedding per .wav or frame-level embeddings.
 
 One embedding per wav: each .txt file should have one vector on the first row, float values separated by white spaces.
 Frame-level embeddings per wav: each .txt file should have one frame per row, embedding values as floats separated by white spaces.  
@@ -11,7 +11,7 @@ Frame-level embeddings per wav: each .txt file should have one frame per row, em
 * Run evaluation software to get overall separability score.
 
 
-#### Running from command line (tested on Narvi and Puhti clusters)
+## Running from command line (tested on Narvi and Puhti clusters)
 
 1) Get a CPU node.  
 
@@ -31,19 +31,19 @@ or for parallel computing (recommended if parfor available):
 
 `sh CDI_lextest.sh '/path_to/original/audios/' '/path_to/extracted/frame_level_embeddings/' 'full' 1`
 
-4) Results will be written in `output.txt`    
+4) Results will be written to `output.txt`    
 
-By default, audio files are located in `CDI_synth/`
+By default, audio files are located in `CDI_synth/` of this repository.
 
-#### Running from MATLAB desktop
+## Running from MATLAB desktop
 
 You can run the code as a normal MATLAB script by calling CDI_lextest.m directly (the same syntax as above).
 
-#### Baseline
+## Baseline replication with provided log-Mel example embeddings
 
 In order to replicate baselines with log-Mel features, run:
 
-`sh CDI_lextest.sh 'CDI_synth/' 'demodata/CDI_embs_uttlevel/'``
+`sh CDI_lextest.sh 'CDI_synth/' 'demodata/CDI_embs_uttlevel/'`
 
 or
 
