@@ -19,16 +19,16 @@ Frame-level embeddings per wav: each .txt file should have one frame per row, em
 
 `module load matlab`  
 
-For utterance-level embeddings, execute:  
+3a) For utterance-level embeddings, execute:  
 
 `sh CDI_lextest.sh '/path_to/original/audios/' '/path_to/extracted/utt_level_embeddings/`
 
-For frame-level embeddings, execute:  
+3b) For frame-level embeddings, execute:  
 
 `sh CDI_lextest.sh '/path_to/original/audios/' '/path_to/extracted/frame_level_embeddings/' 'full' 0`
 
-or for parallel computing:  
+or for parallel computing (recommended if parfor available):  
 
 `sh CDI_lextest.sh '/path_to/original/audios/' '/path_to/extracted/frame_level_embeddings/' 'full' 1`
 
-Results will be written in output.txt    
+4) Results will be written in output.txt    
