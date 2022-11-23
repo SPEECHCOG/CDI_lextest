@@ -49,6 +49,13 @@ for k = 1:length(tmp)
 end
 
 
+word = lower(word);
+for j = 1:length(word)
+    tmp = strfind(word{j},'_');
+    if(~isempty(tmp))
+        word{j}(tmp) = [];
+    end
+end
 
 uq_words = unique(word); % unique word types
 
@@ -125,6 +132,8 @@ if(strcmp(opmode,'single'))
             recall(k,fold) = sum(hypos(k,:) == labels_test(k))./(N_tokens-1);
         end
     end
+
+    word_recall = mean(recall,2);
 
     recall = mean(mean(recall,2));
 
@@ -256,14 +265,26 @@ elseif(strcmp(opmode,'full'))
             end
         end
     end
+    
+    recall = cell2mat(recall)';
 
-    recall = mean(cellfun(@mean,recall));
+    word_recall = mean(recall,2);
+
+    recall = mean(mean(recall,2));
+    
     fprintf('Overall recall: %0.3f%%\n',recall.*100);
 end
 
 fid = fopen([outputdir '/output.txt'],'w');
 fprintf(fid,'Overall recall: %0.3f\n',recall);
 fclose(fid);
+
+fid = fopen([outputdir '/output_words.txt'],'w');
+for w = 1:length(uq_words)
+fprintf(fid,'%s, %0.3f\n',uq_words{w},word_recall(w));
+end
+fclose(fid);
+
 
 
 
