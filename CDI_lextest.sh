@@ -7,14 +7,16 @@ if [ "$#" -lt 2 ]; then
 fi
 
 if [ "$#" -eq 2 ]; then
-  matlab -batch "CDI_lextest '$1' '$2';" > tmp.txt;
+  matlab -batch "CDI_lextest '$1' '$2';";
 elif [ "$#" -eq 3 ]; then
-  matlab -batch "CDI_lextest '$1' '$2' '$3';" > tmp.txt;
+  matlab -batch "CDI_lextest '$1' '$2' '$3';";
 elif [ "$#" -eq 4 ]; then
-  matlab -batch "CDI_lextest '$1' '$2' '$3' $4;" > tmp.txt;
+  matlab -batch "CDI_lextest '$1' '$2' '$3' $4;";
+elif [ "$#" -eq 5 ]; then
+  matlab -batch "CDI_lextest '$1' '$2' '$3' $4 '$5';";
 fi
 
-grep "recall" tmp.txt | { grep -v grep || true; } > output.txt;
-rm tmp.txt
+#grep "recall" tmp.txt | { grep -v grep || true; } > output.txt;
+#rm tmp.txt
 
-echo "CDI_lextest finished. Output written to output.txt."
+echo "CDI_lextest finished."

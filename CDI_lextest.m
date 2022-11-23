@@ -1,4 +1,4 @@
-function recall = CDI_lextest(audiodir,embdir,opmode,runparallel)
+function recall = CDI_lextest(audiodir,embdir,opmode,runparallel,outputdir)
 % function CDI_lextest(audiodir,embdir,opmode,runparallel)
 %
 % Inputs:
@@ -12,6 +12,11 @@ function recall = CDI_lextest(audiodir,embdir,opmode,runparallel)
 %   
 % Outputs:
 %   recall          : overall separability score [0,1]. Larger is better.   
+
+
+if nargin <5
+    outputdir = [fileparts(which('CDI_lextest.m')) '/'];
+end
 
 if nargin <4
     runparallel = 0;
@@ -108,7 +113,7 @@ if(strcmp(opmode,'single'))
         i_train = setxor(i_test,1:length(labels));
 
         labels_train = labels(i_train);
-        labels_test = labels(i_test); % These are always [1, 2, ..., 88]
+        labels_test = labels(i_test); % These are always [1, 2, ..., 89]
 
         D = pdist2(X(i_test,:),X(i_train,:),'cosine');
 
@@ -253,8 +258,12 @@ elseif(strcmp(opmode,'full'))
     end
 
     recall = mean(cellfun(@mean,recall));
-    fprintf('Overall recall: %0.2f%%\n',recall.*100);
+    fprintf('Overall recall: %0.3f%%\n',recall.*100);
 end
+
+fid = fopen([outputdir '/output.txt'],'w');
+fprintf(fid,'Overall recall: %0.3f\n',recall);
+fclose(fid);
 
 
 
