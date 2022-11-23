@@ -31,9 +31,13 @@ or for parallel computing (recommended if parfor available):
 
 `sh CDI_lextest.sh '/path_to/original/audios/' '/path_to/extracted/frame_level_embeddings/' 'full' 1`
 
-4) Results will be written to `output.txt`    
+4) Results will be written to `output.txt`in CDI_lextest main folder. If you want to specify different output folder for the results, give the path as the fifth argument, e.g.:  
+
+`sh CDI_lextest.sh '/path_to/original/audios/' '/path_to/extracted/frame_level_embeddings/' 'full' 1 /path_to/output/folder/`
 
 By default, audio files are located in `CDI_synth/` of this repository.
+
+
 
 ## Running from MATLAB desktop
 
