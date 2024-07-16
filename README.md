@@ -54,3 +54,9 @@ or
 `sh CDI_lextest.sh 'CDI_synth/' 'demodata/CDI_embs_frame/' 'full' 1`
 
 which should produce 17.10% and 47.08%, respectively.
+
+## Citing
+
+If you use this test or its derivations in publications, please cite the following paper:
+
+Khorrami, K., Cruz Blandón, M. A., & Räsänen, O. (2023). Computational insights to acquisition of phonemes, words, and word meanings in early language: sequential or parallel acquisition? Proc. CogSci-2023, Sydney, Australia.
